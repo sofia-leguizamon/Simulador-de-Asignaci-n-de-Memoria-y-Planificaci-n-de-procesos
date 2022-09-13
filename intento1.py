@@ -1,21 +1,23 @@
+
 #cracion de un proceso base y vacio, como si fuera una clase
-def crearProceso(nombre,tamaño):
+#por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+def crearProceso(id,tamaño):
     a=dict()
-    a["nombre"] = nombre
+    a["id"] = id
     a["tamaño"] = tamaño
     a["enUso"] = False
-    a["id"] = None
     a["ta"] = None
     a["ti"] = None
     return a
 
+#Crea unos procesos de prueva y los pone en una lista
 def listaDeProcesosNuevosPorDefault():
     ln=list()
-    ln.append(crearProceso("proceso 1",40))
-    ln.append(crearProceso("proceso 2",140))
-    ln.append(crearProceso("proceso 3",200))
-    ln.append(crearProceso("proceso 4",93))
-    ln.append(crearProceso("proceso 5",42))
+    ln.append(crearProceso(1,40))
+    ln.append(crearProceso(2,140))
+    ln.append(crearProceso(3,200))
+    ln.append(crearProceso(4,93))
+    ln.append(crearProceso(5,42))
     #muestra los procesos creados
     for i in range(len(ln)):
         print(ln[i])
@@ -55,6 +57,12 @@ def crearMemoria():
     
     return nuev
 
+def ponerProcesoEnMemoria(memoria,proceso):
+    return 0
+
+def sacarProcesoDeMemoria(memoria,proceso):
+    return 0
+
 
 
 '''----------------------------------------------------------------------------------------------------------'''
@@ -70,3 +78,46 @@ corriendo=None          #proceso que se esta corriendo
 
 nuevos=listaDeProcesosNuevosPorDefault()
 
+
+
+
+'''
+------------------------------------------------------------------------------------------------------
+---------para implementar futuras funciones---------
+------------------------------------------------------------------------------------------------------
+-una funcion que implemente el worst-fit para la memoria y el proceso
+-un algoritmo que realice la planificacion SJF
+
+-menu de opciones de ingrso de procesos, si quiere por un archivo o manual o default
+
+-cargar proceso manualmente
+-cargar procesos por un archivo externo
+
+-------procesos-------
+-mostrar la tabla de los procesos cargados(los que estarian en la lista de nuevos)
+-mostrar el proceso que esta corriendo
+-El estado de la cola de procesos listos.
+-Listado de procesos que no se encuentran en estado de listo ni ejecución (informar el estado en que se
+encuentran)
+
+
+-------memoria-------
+-mostrar La tabla de particiones de memoria, la cual deberá contener 
+    (Id de partición, dirección de comienzo de partición, 
+    tamaño de la partición, id de proceso asignado a la partición, 
+    fragmentación interna)
+
+
+
+
+fijarse una vez que se pueda:
+-¿como implementar lo de multiprogramacion 5?
+-¿como dar la posibilidad de ingresar un proceso, cuando ocurra un cambio en la memoria,
+    creo que tambien deberiamos dar la opcion de no ingresar ningun proceso mas, 
+    para que no este molestando a cada rato
+-¿como medir el tiempo dentro del algoritmo?
+    podriamos definir una variable T que se vaya incrementando en cada iteracion del codigo
+
+
+------------------------------------------------------------------------------------------------------
+'''
