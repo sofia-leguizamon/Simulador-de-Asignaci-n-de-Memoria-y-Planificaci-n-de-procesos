@@ -1,7 +1,4 @@
 #cracion de un proceso base y vacio, como si fuera una clase
-from tokenize import Octnumber
-
-
 def crearProceso(nombre,tamaño):
     a=dict()
     a["nombre"] = nombre
@@ -11,7 +8,18 @@ def crearProceso(nombre,tamaño):
     a["ta"] = None
     a["ti"] = None
     return a
-    
+
+def listaDeProcesosNuevosPorDefault():
+    ln=list()
+    ln.append(crearProceso("proceso 1",40))
+    ln.append(crearProceso("proceso 2",140))
+    ln.append(crearProceso("proceso 3",200))
+    ln.append(crearProceso("proceso 4",93))
+    ln.append(crearProceso("proceso 5",42))
+    #muestra los procesos creados
+    for i in range(len(ln)):
+        print(ln[i])
+    return ln
 
 #creacion de la memoria, devuelve una lista con las particiones
 def crearMemoria():
@@ -42,20 +50,10 @@ def crearMemoria():
     nuev[3]["tamaño"]=250
 
     #muestro por pantalla para verificar, sacar o comentar las prox 2 lines
-    for i in range(4):
-        print(nuev[i])
+    '''for i in range(4):
+        print(nuev[i])'''
     
     return nuev
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -70,6 +68,5 @@ listos=list()           #lista de los procesos que ya podrian entrar en memoria,
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
 corriendo=None          #proceso que se esta corriendo
 
-
-
+nuevos=listaDeProcesosNuevosPorDefault()
 
