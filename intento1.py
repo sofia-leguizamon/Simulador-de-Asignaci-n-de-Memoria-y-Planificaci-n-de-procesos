@@ -1,24 +1,25 @@
 
 #cracion de un proceso base y vacio, como si fuera una clase
-#por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, tamaño del proceso, tiempo de arribo y tiempo de irrupción.
-def crearProceso(id,tamaño):
+#por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
+# tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
-    a["id"] = id
-    a["tamaño"] = tamaño
-    a["enUso"] = False
-    a["ta"] = None
-    a["ti"] = None
+    a["id"] = id            #el numero de proceso
+    a["tamaño"] = tamaño    #tamño de dicho proceso en kb
+    a["ta"] = ta         #tiempo de arribo
+    a["ti"] = ti          #tiempo de irrupcion
     return a
 
 #Crea unos procesos de prueva y los pone en una lista
 def listaDeProcesosNuevosPorDefault():
     ln=list()
-    ln.append(crearProceso(1,40))
-    ln.append(crearProceso(2,140))
-    ln.append(crearProceso(3,200))
-    ln.append(crearProceso(4,93))
-    ln.append(crearProceso(5,42))
+    ln.append(crearProceso(1,40,0,3))
+    ln.append(crearProceso(2,140,0,4))
+    ln.append(crearProceso(3,200,2,3))
+    ln.append(crearProceso(4,93,2,7))
+    ln.append(crearProceso(5,42,3,3))
     #muestra los procesos creados
+    print("los procesos por defaul creados son:")
     for i in range(len(ln)):
         print(ln[i])
     return ln
@@ -27,10 +28,12 @@ def listaDeProcesosNuevosPorDefault():
 def crearMemoria():
     #deficinicion de la particion
     particion = {
-        "nombre":None,
-        "tamaño":None,
-        "enUso":False,
-        "fragI":0
+        "nombre":None,      #nombre de la particion 
+        "tamaño":None,      #tamaño de la particion
+        "enUso":False,      #si tiene un proceso o no en ella
+        "fragI":0,          #fragmentacion Interna
+        "fragE":False,       #fragmentacion Externa
+        "idProc":None       #es el id del procesos que se encunetre en la particion
     }
     #creacion de la lista que va a tener las particiones
     nuev=list()
@@ -41,6 +44,7 @@ def crearMemoria():
     #cargo los datos de cada particion:
     nuev[0]["nombre"]="sistema operativo"
     nuev[0]["tamaño"]=100
+    nuev[0]["enUso"]=True
 
     nuev[1]["nombre"]="particion 1"
     nuev[1]["tamaño"]=60
@@ -51,14 +55,22 @@ def crearMemoria():
     nuev[3]["nombre"]="particion 3"
     nuev[3]["tamaño"]=250
 
-    #muestro por pantalla para verificar, sacar o comentar las prox 2 lines
-    '''for i in range(4):
-        print(nuev[i])'''
+    #muestro por pantalla para verificar, sacar o comentar las prox 3 lines
+    
+    print("la memoria quedaria asi:")
+    for i in range(4):
+        print(nuev[i])
     
     return nuev
-
-def ponerProcesoEnMemoria(memoria,proceso):
-    return 0
+    
+#carga en la particion, el proceso seleccionado ()
+def ponerProcesoEnMemoria(partic,proce): 
+    #'partic' sera una particion de la memoria
+    #'proce' un proceso de la cola de listos
+    partic["enUso"]=True
+    partic["fragI"]= partic["tamaño"]-proce["tamaño"]
+    partic["idProc"]= proce["id"]
+    return partic
 
 def sacarProcesoDeMemoria(memoria,proceso):
     return 0
@@ -77,14 +89,19 @@ suspendidos=list()      #lista de los procesos que estan en espera de libear esp
 corriendo=None          #proceso que se esta corriendo
 
 nuevos=listaDeProcesosNuevosPorDefault()
-
-
+print()
+print(memoria[1])
+print()
+memoria[1]=ponerProcesoEnMemoria(memoria[1],nuevos[0])
+print(memoria[1])
 
 
 '''
 ------------------------------------------------------------------------------------------------------
 ---------para implementar futuras funciones---------
 ------------------------------------------------------------------------------------------------------
+-funcion que verifique que no haya dos procesos con el mismo id,
+    notificar el errror y expluir procesos en caso afirmativo
 -una funcion que implemente el worst-fit para la memoria y el proceso
 -un algoritmo que realice la planificacion SJF
 
@@ -108,8 +125,6 @@ encuentran)
     fragmentación interna)
 
 
-
-
 fijarse una vez que se pueda:
 -¿como implementar lo de multiprogramacion 5?
 -¿como dar la posibilidad de ingresar un proceso, cuando ocurra un cambio en la memoria,
@@ -117,7 +132,6 @@ fijarse una vez que se pueda:
     para que no este molestando a cada rato
 -¿como medir el tiempo dentro del algoritmo?
     podriamos definir una variable T que se vaya incrementando en cada iteracion del codigo
-
 
 ------------------------------------------------------------------------------------------------------
 '''
