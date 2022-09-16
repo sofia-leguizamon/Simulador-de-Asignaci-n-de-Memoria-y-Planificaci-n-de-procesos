@@ -67,33 +67,43 @@ def crearMemoria():
 def ponerProcesoEnMemoria(partic,proce): 
     #'partic' sera una particion de la memoria
     #'proce' un proceso de la cola de listos
-    partic["enUso"]=True
+    partic["enUso"]= True
     partic["fragI"]= partic["tamaño"]-proce["tamaño"]
     partic["idProc"]= proce["id"]
     return partic
 
-def sacarProcesoDeMemoria(memoria,proceso):
+def sacarProcesoDeMemoria(partic):
+    partic["enUso"]= False
+    partic["fragI"]= 0
+    partic["idProc"]= None
     return 0
 
-
+def algoritmoWorstFit(proceso=None): 
+    global memoria
+    print(memoria)
+    return 0
 
 '''----------------------------------------------------------------------------------------------------------'''
 ''' aqui ya no hay funciones'''
 
 
 memoria=crearMemoria()  #definimos la memoria
-
+#LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
 corriendo=None          #proceso que se esta corriendo
+terminados=list()       #procesos que ya han terminado, que ya se corrieron 
+
 
 nuevos=listaDeProcesosNuevosPorDefault()
-print()
+
+'''print()
 print(memoria[1])
 print()
 memoria[1]=ponerProcesoEnMemoria(memoria[1],nuevos[0])
-print(memoria[1])
+print(memoria[1])'''
+algoritmoWorstFit()
 
 
 '''
@@ -104,6 +114,7 @@ print(memoria[1])
     notificar el errror y expluir procesos en caso afirmativo
 -una funcion que implemente el worst-fit para la memoria y el proceso
 -un algoritmo que realice la planificacion SJF
+    este algoritmo solo trabja en la cola de "listos" 
 
 -menu de opciones de ingrso de procesos, si quiere por un archivo o manual o default
 
