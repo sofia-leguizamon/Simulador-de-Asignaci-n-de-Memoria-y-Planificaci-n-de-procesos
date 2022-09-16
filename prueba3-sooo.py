@@ -1,11 +1,11 @@
 
-#cracion de un proceso base y vacio, como si fuera una clase
+#creacion de un proceso base y vacio, como si fuera una clase
 #por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
 # tamaño del proceso, tiempo de arribo y tiempo de irrupción.
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
-    a["tamaño"] = tamaño    #tamño de dicho proceso en kb
+    a["tamaño"] = tamaño    #tamaño de dicho proceso en kb
     a["ta"] = ta         #tiempo de arribo
     a["ti"] = ti          #tiempo de irrupcion
     return a
@@ -75,6 +75,32 @@ def ponerProcesoEnMemoria(partic,proce):
 def sacarProcesoDeMemoria(memoria,proceso):
     return 0
 
+'''funcion que verifique que no haya dos procesos con el mismo id,
+    notificar el errror y expluir procesos en caso afirmativo'''
+
+def verificarError(procesoNuevo, nuevos, listos, suspendidos, terminados, corriendo):
+    union=[]
+    union.extend(nuevos)
+    union.extend(listos)
+    union.extend(suspendidos)
+    union.extend(terminados)
+    union.append(corriendo)
+    for i in range(len(union)):
+        print(union[i])
+    for i in range(len(union)):
+       if ( union[i] != [] and union[i]["id"] == procesoNuevo["id"]):
+           print("Error en proceso, excluido")
+           return (False)
+    return (True) 
+
+def wordsFit(nuevos, suspendidos, corriendo, particion):
+    nuevos[tamaño] memoria[particion][tamaño]
+
+
+
+
+
+
 
 
 '''----------------------------------------------------------------------------------------------------------'''
@@ -86,22 +112,22 @@ memoria=crearMemoria()  #definimos la memoria
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
-corriendo=None          #proceso que se esta corriendo
+corriendo=list()          #proceso que se esta corriendo
+terminados=list()      #procesos que ya han terminado, que ya se corrieron  
+
 
 nuevos=listaDeProcesosNuevosPorDefault()
-print()
-print(memoria[1])
-print()
-memoria[1]=ponerProcesoEnMemoria(memoria[1],nuevos[0])
-print(memoria[1])
+a=crearProceso(1,400,3,4)
+print("proceso nuevo", a)
+print(a["id"])
+print(verificarError(a, nuevos, listos, suspendidos, terminados, corriendo))
 
 
 '''
 ------------------------------------------------------------------------------------------------------
 ---------para implementar futuras funciones---------
 ------------------------------------------------------------------------------------------------------
--funcion que verifique que no haya dos procesos con el mismo id,
-    notificar el errror y expluir procesos en caso afirmativo
+
 -una funcion que implemente el worst-fit para la memoria y el proceso
 -un algoritmo que realice la planificacion SJF
 
@@ -132,6 +158,11 @@ fijarse una vez que se pueda:
     para que no este molestando a cada rato
 -¿como medir el tiempo dentro del algoritmo?
     podriamos definir una variable T que se vaya incrementando en cada iteracion del codigo
+
+
+
+aclaracines del profe 15/09
+-verificar errores de ingresos de datos en los procesos ... el profe puede poner en un TA 0-12'
 
 ------------------------------------------------------------------------------------------------------
 '''
