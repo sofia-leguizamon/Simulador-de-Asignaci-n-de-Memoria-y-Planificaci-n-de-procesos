@@ -17,7 +17,7 @@ def listaDeProcesosNuevosPorDefault():
     ln.append(crearProceso(2,140,0,4))
     ln.append(crearProceso(3,200,2,3))
     ln.append(crearProceso(4,93,2,7))
-    ln.append(crearProceso(5,42,3,3))
+    ln.append(crearProceso(5,77,3,3))
     #muestra los procesos creados
     print("los procesos por defaul creados son:")
     for i in range(len(ln)):
@@ -32,8 +32,9 @@ def crearMemoria():
         "tamaño":None,      #tamaño de la particion
         "enUso":False,      #si tiene un proceso o no en ella
         "fragI":0,          #fragmentacion Interna
-        "fragE":False,       #fragmentacion Externa
-        "idProc":None       #es el id del procesos que se encunetre en la particion
+        "fragE":False,      #fragmentacion Externa
+        "idProc":None ,     #es el id del procesos que se encunetre en la particion
+        "idMemo":None      
     }
     #creacion de la lista que va a tener las particiones
     nuev=list()
@@ -45,15 +46,19 @@ def crearMemoria():
     nuev[0]["nombre"]="sistema operativo"
     nuev[0]["tamaño"]=100
     nuev[0]["enUso"]=True
+    nuev[0]["idMemo"]=1
 
     nuev[1]["nombre"]="particion 1"
     nuev[1]["tamaño"]=60
+    nuev[1]["idMemo"]=2
 
     nuev[2]["nombre"]="particion 2"
     nuev[2]["tamaño"]=120
+    nuev[2]["idMemo"]=3
 
     nuev[3]["nombre"]="particion 3"
     nuev[3]["tamaño"]=250
+    nuev[3]["idMemo"]=4
 
     #muestro por pantalla para verificar, sacar o comentar las prox 3 lines
     
@@ -78,16 +83,31 @@ def sacarProcesoDeMemoria(partic):
     partic["idProc"]= None
     return 0
 
+#esta funcion coloca un proceso segun worst fitn en la memoria
 def algoritmoWorstFit(proceso=None): 
     global memoria
-    print(memoria)
-    return 0
+    for i in memoria:
+        if  not(i["enUso"]) and proceso["tamaño"]<= i["tamaño"]:
+            ponerProcesoEnMemoria(i,proceso)
+            return True
+        else:
+            print("memoria ocupada")
+    print("el procesos ",proceso["id"],"no se pudo colocar en memoria")
+    return False
+
+
+
 
 '''----------------------------------------------------------------------------------------------------------'''
 ''' aqui ya no hay funciones'''
 
 
 memoria=crearMemoria()  #definimos la memoria
+
+memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True)
+#esta funcion ordena el arreglo de diccionarios y los ordena de mayor a menor segun indique el campo ["tamaño"]
+#esto se hace para facilitar la incercion del worst-fit
+
 #LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
@@ -103,7 +123,18 @@ print(memoria[1])
 print()
 memoria[1]=ponerProcesoEnMemoria(memoria[1],nuevos[0])
 print(memoria[1])'''
-algoritmoWorstFit()
+
+
+print();print();print()
+if algoritmoWorstFit(nuevos[4]):
+    print("proceso colocado")
+
+
+
+
+print();print();print()
+for i in memoria:
+    print(i)
 
 
 '''
@@ -112,7 +143,11 @@ algoritmoWorstFit()
 ------------------------------------------------------------------------------------------------------
 -funcion que verifique que no haya dos procesos con el mismo id,
     notificar el errror y expluir procesos en caso afirmativo
+    sofi---
+
 -una funcion que implemente el worst-fit para la memoria y el proceso
+    ya esta
+
 -un algoritmo que realice la planificacion SJF
     este algoritmo solo trabja en la cola de "listos" 
 
