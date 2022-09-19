@@ -95,6 +95,14 @@ def algoritmoWorstFit(proceso=None):
     print("el procesos ",proceso["id"],"no se pudo colocar en memoria")
     return False
 
+def AplicarAlgoritmoSJF():
+
+
+    
+    return 0
+
+def mostrarTablaDeMemoria():
+    return 0
 
 
 
