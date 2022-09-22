@@ -84,7 +84,7 @@ def sacarProcesoDeMemoria(partic):
     return 0
 
 #esta funcion coloca un proceso segun worst fitn en la memoria
-def algoritmoWorstFit(proceso=None): 
+def algoritmoWorstFit(proceso): 
     global memoria
     for i in memoria:
         if  not(i["enUso"]) and proceso["tamaño"]<= i["tamaño"]:
@@ -96,6 +96,8 @@ def algoritmoWorstFit(proceso=None):
     return False
 
 def AplicarAlgoritmoSJF():
+    global nuevos
+
 
 
     
@@ -114,7 +116,7 @@ memoria=crearMemoria()  #definimos la memoria
 
 memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True)
 #esta funcion ordena el arreglo de diccionarios y los ordena de mayor a menor segun indique el campo ["tamaño"]
-#esto se hace para facilitar la incercion del worst-fit
+#esto se hace para facilitar la incercion del worst-fit, gracias al reverse=True
 
 #LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA

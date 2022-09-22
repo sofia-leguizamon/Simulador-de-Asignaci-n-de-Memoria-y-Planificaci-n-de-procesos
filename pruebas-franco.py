@@ -24,7 +24,6 @@ print(b)
 print(c)'''
 
 import os
-from traceback import print_tb
 #prueba de archivos, crea y escritura de un archivo
 '''
 archivo=open("hola.txt","w")
@@ -46,7 +45,7 @@ archivo.close()
 '''
 
 #archivos lectura de datos
-archivoEntrada=open("pruebaDeArchivo.txt","r")
+'''archivoEntrada=open("pruebaDeArchivo.txt","r")
 a=dict()
 archivoEntrada.readline()      #salto la primera linea del txt, ya que explica las columnas nomas
 for linea in archivoEntrada:
@@ -54,8 +53,11 @@ for linea in archivoEntrada:
     #espacios en blanco, cada elemento cortado lo coloco en una varible
     #nota: si se agrega una columna en el txt tenemos que agregar una nueva variable
     m,n,o=linea.split()
-    
 print(m)
 print(n)
-print(o)
+print(o)'''
+
+
+#execp
+
 
