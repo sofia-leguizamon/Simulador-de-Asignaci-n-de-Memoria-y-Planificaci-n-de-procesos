@@ -6,23 +6,63 @@ def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
     a["tamaño"] = tamaño    #tamño de dicho proceso en kb
-    a["ta"] = ta         #tiempo de arribo
-    a["ti"] = ti          #tiempo de irrupcion
+    a["ta"] = ta            #tiempo de arribo
+    a["ti"] = ti            #tiempo de irrupcion
     return a
 
 #Crea unos procesos de prueva y los pone en una lista
 def listaDeProcesosNuevosPorDefault():
+    global idAutoIncr
     ln=list()
-    ln.append(crearProceso(1,40,0,3))
-    ln.append(crearProceso(2,140,0,4))
-    ln.append(crearProceso(3,200,2,3))
-    ln.append(crearProceso(4,93,2,7))
-    ln.append(crearProceso(5,77,3,3))
+    ln.append(crearProceso(idAutoIncr,40,0,3))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,140,0,4))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,200,2,3))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,93,2,7))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,77,3,3))
+    idAutoIncr+=1
     #muestra los procesos creados
     print("los procesos por defaul creados son:")
     for i in range(len(ln)):
         print(ln[i])
     return ln
+
+#
+def ingresarUnProcesoPorPantalla():
+    global idAutoIncr
+    idp=idAutoIncr
+    idAutoIncr+=1
+    print()
+    while True:
+        try:
+            tamp=int(input("Ingrese el tamaño del proceso: "))
+            break
+        except:
+            print("Error al ingresar el tamaño, solo numeros enteros y sin otro tipo de caracteres")
+            print("Trate de nuevo --> ")
+    while True:
+        try:
+            tap=int(input("Ingrese el TA del proceso: "))
+            break
+        except:
+            print("Error al ingresar el TA, solo numeros enteros y sin otro tipo de caracteres")
+            print("Trate de nuevo --> ")
+    while True:
+        try:
+            tip=int(input("Ingrese el TI del proceso: "))
+            break
+        except:
+            print("Error al ingresar el TI, solo numeros enteros y sin otro tipo de caracteres")
+            print("Trate de nuevo --> ")
+
+    p=crearProceso(idp,tamp,tap,tip)
+    print("el proceso ingresado fue: ")
+    print(p)
+    #aca tenemos que debolver el proceso recien cargado.
+    return 0
 
 #creacion de la memoria, devuelve una lista con las particiones
 def crearMemoria():
@@ -95,12 +135,10 @@ def algoritmoWorstFit(proceso):
     print("el procesos ",proceso["id"],"no se pudo colocar en memoria")
     return False
 
+#basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
 def AplicarAlgoritmoSJF():
     global nuevos
-
-
-
-    
+    nuevos=sorted(nuevos, key=lambda particion : particion['tamaño'],reverse=True)
     return 0
 
 def mostrarTablaDeMemoria():
@@ -109,14 +147,17 @@ def mostrarTablaDeMemoria():
 
 
 '''----------------------------------------------------------------------------------------------------------'''
-''' aqui ya no hay funciones'''
+''' aqui ya no hay funciones -- codigo madre'''
+T=0 #tiempo de la cpu, esta va  a ser la medida de tiempo que vamos a tener en la misma corrida
+Multiprogramacion=5             #esta bariable solo va a tener valores del 0 al 5
 
+idAutoIncr=0 #se define el id de que se va a ir incrementando por cada proceso que entre en la corrida
 
 memoria=crearMemoria()  #definimos la memoria
-
 memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True)
 #esta funcion ordena el arreglo de diccionarios y los ordena de mayor a menor segun indique el campo ["tamaño"]
 #esto se hace para facilitar la incercion del worst-fit, gracias al reverse=True
+
 
 #LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
@@ -126,25 +167,27 @@ corriendo=None          #proceso que se esta corriendo
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
 
+
 nuevos=listaDeProcesosNuevosPorDefault()
 
-'''print()
-print(memoria[1])
-print()
-memoria[1]=ponerProcesoEnMemoria(memoria[1],nuevos[0])
-print(memoria[1])'''
-
-
-print();print();print()
+'''print();print();print()
 if algoritmoWorstFit(nuevos[4]):
     print("proceso colocado")
 
-
-
-
 print();print();print()
 for i in memoria:
-    print(i)
+    print(i)'''
+
+ingresarUnProcesoPorPantalla()
+
+
+#CODIGO MADRE
+while True:
+    
+    
+    break
+    T+=1
+
 
 
 '''
@@ -156,20 +199,24 @@ for i in memoria:
     sofi---
 
 -una funcion que implemente el worst-fit para la memoria y el proceso
-    ya esta
+    -----ya esta----
 
 -un algoritmo que realice la planificacion SJF
     este algoritmo solo trabja en la cola de "listos" 
+    -----ya esta----
 
 -menu de opciones de ingrso de procesos, si quiere por un archivo o manual o default
 
 -cargar proceso manualmente
+    -----ya esta----
+
 -cargar procesos por un archivo externo
+    -----ya casiii esta----
 
 -------procesos-------
 -mostrar la tabla de los procesos cargados(los que estarian en la lista de nuevos)
--mostrar el proceso que esta corriendo
--El estado de la cola de procesos listos.
+-mostrar el proceso que esta corriendo (el proceso que esta en corriendo)
+-El estado de la cola de procesos listos(lista de listos).
 -Listado de procesos que no se encuentran en estado de listo ni ejecución (informar el estado en que se
 encuentran)
 
@@ -188,7 +235,7 @@ fijarse una vez que se pueda:
     para que no este molestando a cada rato
 -¿como medir el tiempo dentro del algoritmo?
     podriamos definir una variable T que se vaya incrementando en cada iteracion del codigo
-
+    --- ya esta ----
 
 
 aclaracines del profe 15/09
