@@ -24,13 +24,9 @@ def listaDeProcesosNuevosPorDefault():
     idAutoIncr+=1
     ln.append(crearProceso(idAutoIncr,77,3,3))
     idAutoIncr+=1
-    #muestra los procesos creados
-    print("los procesos por defaul creados son:")
-    for i in range(len(ln)):
-        print(ln[i])
     return ln
 
-#
+#pide y verifica el ingreso de un proceso por pantalla, debolviendp dicho proceso como un diccionario ya definido
 def ingresarUnProcesoPorPantalla():
     global idAutoIncr
     idp=idAutoIncr
@@ -62,7 +58,7 @@ def ingresarUnProcesoPorPantalla():
     print("el proceso ingresado fue: ")
     print(p)
     #aca tenemos que debolver el proceso recien cargado.
-    return 0
+    return p
 
 #creacion de la memoria, devuelve una lista con las particiones
 def crearMemoria():
@@ -81,7 +77,6 @@ def crearMemoria():
     #creacion de las particiones y agregacion a la lista
     for i in range(4):
         nuev.append(dict(particion))
-
     #cargo los datos de cada particion:
     nuev[0]["nombre"]="sistema operativo"
     nuev[0]["tamaño"]=100
@@ -101,11 +96,6 @@ def crearMemoria():
     nuev[3]["idMemo"]=4
 
     #muestro por pantalla para verificar, sacar o comentar las prox 3 lines
-    
-    print("la memoria quedaria asi:")
-    for i in range(4):
-        print(nuev[i])
-    
     return nuev
     
 #carga en la particion, el proceso seleccionado ()
@@ -144,6 +134,16 @@ def AplicarAlgoritmoSJF():
 def mostrarTablaDeMemoria():
     return 0
 
+def tabla(name,table):
+    print("\n",name,"\n")
+    for i in table:
+        print(i)
+    print()
+    return 0 
+
+def terminoTodo():
+    global nuevos,listos,suspendidos,corriendo
+    return (len(nuevos)==0 and  len(listos)==0 and len(suspendidos)==0 and len(corriendo)==0)
 
 
 '''----------------------------------------------------------------------------------------------------------'''
@@ -163,9 +163,8 @@ memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
-corriendo=None          #proceso que se esta corriendo
+corriendo=list()     #proceso que se esta corriendo
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
-
 
 
 nuevos=listaDeProcesosNuevosPorDefault()
@@ -174,19 +173,26 @@ nuevos=listaDeProcesosNuevosPorDefault()
 if algoritmoWorstFit(nuevos[4]):
     print("proceso colocado")
 
-print();print();print()
-for i in memoria:
-    print(i)'''
+ingresarUnProcesoPorPantalla()'''
 
-ingresarUnProcesoPorPantalla()
+tabla("nuevos",nuevos)
+tabla("momoria",memoria)
+
+
 
 
 #CODIGO MADRE
 while True:
+    print("el tiempo es de: ",T)
     
     
-    break
     T+=1
+    if T==2:
+        break
+
+    #esto va a terminar cuando todos  los procesos esten terminados, osea que las otras listas esten vacias
+
+
 
 
 
