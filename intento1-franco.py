@@ -2,6 +2,10 @@
 #cracion de un proceso base y vacio, como si fuera una clase
 #por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
 # tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+from configparser import NoOptionError
+from traceback import print_tb
+
+
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
@@ -69,8 +73,9 @@ def crearMemoria():
         "enUso":False,      #si tiene un proceso o no en ella
         "fragI":0,          #fragmentacion Interna
         "fragE":False,      #fragmentacion Externa
-        "idProc":None ,     #es el id del procesos que se encunetre en la particion
-        "idMemo":None      
+        "Proceso":None ,    #es el procesos que se encunetre en la particion
+        "idMemo":None,
+        "ejecutando":False   #si el proceso que esta en esa particion esta en ejecucion      
     }
     #creacion de la lista que va a tener las particiones
     nuev=list()
@@ -104,25 +109,23 @@ def ponerProcesoEnMemoria(partic,proce):
     #'proce' un proceso de la cola de listos
     partic["enUso"]= True
     partic["fragI"]= partic["tamaño"]-proce["tamaño"]
-    partic["idProc"]= proce["id"]
+    partic["Proceso"]= proce
     return partic
 
 def sacarProcesoDeMemoria(partic):
     partic["enUso"]= False
     partic["fragI"]= 0
-    partic["idProc"]= None
+    partic["Proceso"]= None
     return 0
 
-#esta funcion coloca un proceso segun worst fitn en la memoria
+#esta funcion coloca un proceso segun worst fitn en la memoria y devuelve un valor verdadero
+# si lo coloco y uno falso si no
 def algoritmoWorstFit(proceso): 
     global memoria
     for i in memoria:
         if  not(i["enUso"]) and proceso["tamaño"]<= i["tamaño"]:
             ponerProcesoEnMemoria(i,proceso)
             return True
-        else:
-            print("memoria ocupada")
-    print("el procesos ",proceso["id"],"no se pudo colocar en memoria")
     return False
 
 #basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
@@ -131,9 +134,7 @@ def AplicarAlgoritmoSJF():
     nuevos=sorted(nuevos, key=lambda particion : particion['tamaño'],reverse=True)
     return 0
 
-def mostrarTablaDeMemoria():
-    return 0
-
+#esto es solo para mi para verificar las tablas- borar al final
 def tabla(name,table):
     print("\n",name,"\n")
     for i in table:
@@ -141,15 +142,58 @@ def tabla(name,table):
     print()
     return 0 
 
+#esta es la verificacion de fin del algoritmo
 def terminoTodo():
     global nuevos,listos,suspendidos,corriendo
     return (len(nuevos)==0 and  len(listos)==0 and len(suspendidos)==0 and len(corriendo)==0)
+
+def deNuevosAListos():
+    global nuevos,listos,T
+    con=0
+    for i in range(len(nuevos)):
+        if T>=nuevos[i-con]["ta"]:
+            listos.append(nuevos[i-con])
+            nuevos.remove(nuevos[i-con])
+            con+=1
+
+def procesosFinaliza():
+    return 0
+
+def CorrerProcesoDeM():
+    global memoria,ayudaMemoria
+    #verifico que no haya un proceso en ejecucion
+    for part in memoria:
+        if part["ejecutando"]:
+            return 0
+    cont=0
+    #verifico que haya procesos cargados en memoria
+    for part in memoria:
+        if part["Proceso"]==None:
+            cont+=1
+        if cont==4:
+            return 0
+
+    x=10000
+    s=0
+    cont=0
+    for part in memoria:
+        if (part["idMemo"]!=1)and(part["Proceso"]!=None):
+            print (part)
+            if part["Proceso"]["ta"] < x:
+                x=part["Proceso"]["ta"]
+                s=cont
+        cont+=1
+        
+
 
 
 '''----------------------------------------------------------------------------------------------------------'''
 ''' aqui ya no hay funciones -- codigo madre'''
 T=0 #tiempo de la cpu, esta va  a ser la medida de tiempo que vamos a tener en la misma corrida
+
 Multiprogramacion=5             #esta bariable solo va a tener valores del 0 al 5
+
+cambios=False       #boolean que indica si hubo cambios true para si false para no
 
 idAutoIncr=0 #se define el id de que se va a ir incrementando por cada proceso que entre en la corrida
 
@@ -163,7 +207,7 @@ memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
-corriendo=list()     #proceso que se esta corriendo
+corriendo=list()        #proceso que se esta corriendo
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
 
@@ -179,17 +223,36 @@ tabla("nuevos",nuevos)
 tabla("momoria",memoria)
 
 
+ponerProcesoEnMemoria(memoria[0],crearProceso(idAutoIncr,100,2,4))
+ponerProcesoEnMemoria(memoria[1],crearProceso(idAutoIncr,100,1,4))
+ponerProcesoEnMemoria(memoria[3],crearProceso(idAutoIncr,40,3,4))
+tabla("memoria",memoria)
 
+CorrerProcesoDeM()
+print("-----------------------------------------------------------------------------------------")
+CorrerProcesoDeM()
 
 #CODIGO MADRE
 while True:
-    print("el tiempo es de: ",T)
-    
-    
+    break
+    print(">------------------------------tiempo= ",T,"------------------------------<")
+    #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listos y salgan de la lista de nuevos
+    deNuevosAListos()
+    #2. por cada unidad de tiempo verifica que no se puedan colocar procesos de la lista de listos en la memoria
+    listaMomentania=[]
+    for p in listos:
+        if algoritmoWorstFit(p):
+            print("proceso  ",p," --> colocado")
+            tabla("momoria",memoria)
+            listaMomentania.append(p)
+        else:
+            print("proceso  ",p," --> NO PUDO SER COLOCADO")
+    #los porcesos colocados se borran de la cola de listos y quedan en la memoria
+    for r in listaMomentania:
+        listos.remove(r)
     T+=1
-    if T==2:
+    if T==3:
         break
-
     #esto va a terminar cuando todos  los procesos esten terminados, osea que las otras listas esten vacias
 
 
