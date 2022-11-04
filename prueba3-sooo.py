@@ -2,6 +2,10 @@
 #creacion de un proceso base y vacio, como si fuera una clase
 #por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
 # tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+
+from re import A
+from tabulate import tabulate
+
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
@@ -93,8 +97,11 @@ def verificarError(procesoNuevo, nuevos, listos, suspendidos, terminados, corrie
            return (False)
     return (True) 
 
-def wordsFit(nuevos, suspendidos, corriendo, particion):
-    nuevos[tamaño] memoria[particion][tamaño]
+#def wordsFit(nuevos, suspendidos, corriendo, particion):
+   # nuevos[tamaño] memoria[particion][tamaño]
+
+
+
 
 
 
@@ -115,12 +122,15 @@ suspendidos=list()      #lista de los procesos que estan en espera de libear esp
 corriendo=list()          #proceso que se esta corriendo
 terminados=list()      #procesos que ya han terminado, que ya se corrieron  
 
-
 nuevos=listaDeProcesosNuevosPorDefault()
+print(tabulate(nuevos, headers=["id", "Tamaño", "ta", "ti"]))
+print("......")
 a=crearProceso(1,400,3,4)
-print("proceso nuevo", a)
+print("proceso nuevo", a) 
 print(a["id"])
 print(verificarError(a, nuevos, listos, suspendidos, terminados, corriendo))
+# funcion que muestra los procesos que esten en estado de nuevos. 
+
 
 
 '''
