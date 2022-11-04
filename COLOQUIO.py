@@ -148,7 +148,6 @@ def terminoTodo():
     global nuevos,listos,suspendidos,corriendo
     return (len(nuevos)==0 and  len(listos)==0 and len(suspendidos)==0 and len(corriendo)==0)
 
-#pasa los proces de la cola de listos a la cola de nuevos si se cumple su tiempo de arribo
 def deNuevosAListos():
     global nuevos,listos,T,cambios
     con=0
@@ -159,7 +158,6 @@ def deNuevosAListos():
             con+=1
             cambios=True
 
-#esta funcion verifica si termino algun proceso en el tiempo T
 def verificarProcesoFinalido():
     global memoria,T,Tp,cambios
     for part in memoria:
@@ -170,7 +168,6 @@ def verificarProcesoFinalido():
                 cambios=True
     return 0
 
-#esta funcion selecciona un proceso de la memoria(el de menor tiempo de irrupion) y lo pone en ejecucion
 def CorrerProcesoDeM():
     global memoria,ayudaMemoria,T,Tp,cambios
     #verifico que no haya un proceso en ejecucion
@@ -215,8 +212,8 @@ def CorrerProcesoDeM():
 
 
 
-T=0     #tiempo de la cpu, esta va  a ser la medida de tiempo que vamos a tener en la misma corrida
-Tp=0    #Variable axiliar que nos permitira saber si comenzo a ejecutarse el 
+T=0 #tiempo de la cpu, esta va  a ser la medida de tiempo que vamos a tener en la misma corrida
+Tp=0#Variable axiliar que nos permitira saber si comenzo a ejecutarse el 
 
 Multiprogramacion=5             #esta bariable solo va a tener valores del 0 al 5
 
@@ -234,9 +231,17 @@ memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
+corriendo=list()        #proceso que se esta corriendo
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
+
 nuevos=listaDeProcesosNuevosPorDefault()
+
+'''print();print();print()
+if algoritmoWorstFit(nuevos[4]):
+    print("proceso colocado")
+
+ingresarUnProcesoPorPantalla()'''
 
 tabla("nuevos",nuevos)
 tabla("momoria",memoria)
@@ -284,3 +289,57 @@ while True:
 tabla("memoria",memoria)
 tabla("terminados",terminados)
 
+
+'''
+------------------------------------------------------------------------------------------------------
+---------para implementar futuras funciones---------
+------------------------------------------------------------------------------------------------------
+******funcion que verifique que no haya dos procesos con el mismo id,
+    notificar el errror y expluir procesos en caso afirmativo
+    sofi---
+
+******una funcion que implemente el worst-fit para la memoria y el proceso
+    -----ya esta----
+
+-un algoritmo que realice la planificacion SJF
+    este algoritmo solo trabja en la cola de "listos" 
+  
+
+-menu de opciones de ingrso de procesos, si quiere por un archivo o manual o default
+
+******cargar proceso manualmente
+    -----ya esta----
+
+-cargar procesos por un archivo externo
+    -----ya casiii esta----
+
+-------procesos-------
+-mostrar la tabla de los procesos cargados(los que estarian en la lista de nuevos)
+-mostrar el proceso que esta corriendo (el proceso que esta en corriendo)
+-El estado de la cola de procesos listos(lista de listos).
+-Listado de procesos que no se encuentran en estado de listo ni ejecución (informar el estado en que se
+encuentran)
+
+
+-------memoria-------
+-mostrar La tabla de particiones de memoria, la cual deberá contener 
+    (Id de partición, dirección de comienzo de partición, 
+    tamaño de la partición, id de proceso asignado a la partición, 
+    fragmentación interna)
+
+
+fijarse una vez que se pueda:
+-¿como implementar lo de multiprogramacion 5?
+-¿como dar la posibilidad de ingresar un proceso, cuando ocurra un cambio en la memoria,
+    creo que tambien deberiamos dar la opcion de no ingresar ningun proceso mas, 
+    para que no este molestando a cada rato
+-¿como medir el tiempo dentro del algoritmo?
+    podriamos definir una variable T que se vaya incrementando en cada iteracion del codigo
+    --- ya esta ----
+
+
+aclaracines del profe 15/09
+-verificar errores de ingresos de datos en los procesos ... el profe puede poner en un TA 0-12'
+
+------------------------------------------------------------------------------------------------------
+'''

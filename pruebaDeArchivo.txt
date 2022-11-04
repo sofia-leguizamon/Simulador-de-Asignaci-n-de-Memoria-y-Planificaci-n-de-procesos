@@ -1,2 +1,2 @@
 numero letra otro
-4 x hola
+4   x   hola

@@ -45,7 +45,7 @@ archivo.close()
 '''
 
 #archivos lectura de datos
-'''archivoEntrada=open("pruebaDeArchivo.txt","r")
+archivoEntrada=open("pruebaDeArchivo.txt","r")
 a=dict()
 archivoEntrada.readline()      #salto la primera linea del txt, ya que explica las columnas nomas
 for linea in archivoEntrada:
@@ -55,9 +55,12 @@ for linea in archivoEntrada:
     m,n,o=linea.split()
 print(m)
 print(n)
-print(o)'''
+print(o)
 
 
 #execp
-
+'''try:
+    a=2/0
+except:
+    print("error tontooooo")'''
 
