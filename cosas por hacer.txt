@@ -1,0 +1,38 @@
+------------------------------------------------------------------------------------------------------
+---------para implementar futuras funciones---------
+------------------------------------------------------------------------------------------------------
+
+-un algoritmo que realice la planificacion SJF
+    este algoritmo solo trabja en la cola de "listos" 
+  
+
+-menu de opciones de ingrso de procesos, si quiere por un archivo o manual o default
+
+
+-cargar procesos por un archivo externo
+    -----ya casiii esta----
+
+-------procesos-------
+-mostrar la tabla de los procesos cargados(los que estarian en la lista de nuevos)
+-mostrar el proceso que esta corriendo (el proceso que esta en corriendo)
+-El estado de la cola de procesos listos(lista de listos).
+-Listado de procesos que no se encuentran en estado de listo ni ejecución (informar el estado en que se
+encuentran)
+
+
+-------memoria-------
+-mostrar La tabla de particiones de memoria, la cual deberá contener 
+    (Id de partición, dirección de comienzo de partición, 
+    tamaño de la partición, id de proceso asignado a la partición, 
+    fragmentación interna)
+
+otros:
+
+-funcion de condicion de fin del codigo madre
+
+-implementar lo de multiprogramacion 5
+
+-funcion del SJF que saque un proceso de memoria si existe un proceso en la cola de listos con tiempo de irrupcion menor al de los que estan en  memoria
+
+------------------------------------------------------------------------------------------------------
+'''
