@@ -18,13 +18,16 @@ def listaDeProcesosNuevosPorDefault():
     idAutoIncr+=1
     ln.append(crearProceso(idAutoIncr,140,0,4))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,20,2,3))
+    ln.append(crearProceso(idAutoIncr,20,0,3))
     idAutoIncr+=1
-    '''
-    ln.append(crearProceso(idAutoIncr,93,2,7))
+    ln.append(crearProceso(idAutoIncr,93,0,7))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,77,3,3))
-    idAutoIncr+=1'''
+    ln.append(crearProceso(idAutoIncr,77,0,3))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,20,0,3))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,30,2,3))
+    idAutoIncr+=1
     return ln
 
 #pide y verifica el ingreso de un proceso por pantalla, debolviendp dicho proceso como un diccionario ya definido
@@ -111,10 +114,11 @@ def ponerProcesoEnMemoria(partic,proce):
     return partic
 
 def sacarProcesoDeMemoria(partic):
-    global terminados
+    global terminados,Multiprogramacion
     partic["enUso"]= False
     partic["fragI"]= 0
     terminados.append(partic["Proceso"])
+    Multiprogramacion+=1        #aca sumo uno a la multi porque termino un proces
     partic["Proceso"]= None
     partic["ejecutando"]=False
     return 0
@@ -150,21 +154,22 @@ def terminoTodo():
 
 #pasa los proces de la cola de listos a la cola de nuevos si se cumple su tiempo de arribo
 def deNuevosAListos():
-    global nuevos,listos,T,cambios
+    global nuevos,listos,T,cambios,Multiprogramacion
     con=0
     for i in range(len(nuevos)):
-        if T>=nuevos[i-con]["ta"]:
+        if T>=nuevos[i-con]["ta"] and Multiprogramacion>0: #verifico aca tambien lo de la multi programacion
             listos.append(nuevos[i-con])
             nuevos.remove(nuevos[i-con])
             con+=1
             cambios=True
+            Multiprogramacion-=1    #aca resto 1 porque pasa un proceso de la cola de nuevos a listos
 
 #esta funcion verifica si termino algun proceso en el tiempo T
 def verificarProcesoFinalido():
     global memoria,T,Tp,cambios
     for part in memoria:
         if (part["Proceso"]!=None) and (part["ejecutando"]):
-            if part["Proceso"]["ti"]+Tp-1==T:
+            if part["Proceso"]["ti"]+Tp==T:
                 print("termino el proceso : ",part["Proceso"])
                 sacarProcesoDeMemoria(part)
                 cambios=True
@@ -241,16 +246,14 @@ nuevos=listaDeProcesosNuevosPorDefault()
 tabla("nuevos",nuevos)
 tabla("momoria",memoria)
 
-
-'''ponerProcesoEnMemoria(memoria[1],crearProceso(idAutoIncr,100,1,2))
-ponerProcesoEnMemoria(memoria[3],crearProceso(idAutoIncr,40,3,4))
-tabla("memoria",memoria)'''
-
 #CODIGO MADRE
 while True:
-    print(">------------------------------tiempo= ",T,"------------------------------<")
+    print(">------------------------------tiempo= ",T,"-- multiProg=",Multiprogramacion,"------------------------------<")
     #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listos y salgan de la lista de nuevos
+    
+    verificarProcesoFinalido()  #se hace esta verificacion porque cuando un proceso termina ya tiene que ingresar otro
     deNuevosAListos()
+    
     #2. por cada unidad de tiempo verifica que no se puedan colocar procesos de la lista de listos en la memoria
     listaMomentania=[]
     for p in listos:
@@ -263,6 +266,7 @@ while True:
     #los porcesos colocados se borran de la cola de listos y quedan en la memoria
     for r in listaMomentania:
         listos.remove(r)
+    
     #3. por cada unidad de tiempo veridica si se puede correr un proceso o si un proceso finalizo
     CorrerProcesoDeM()
     verificarProcesoFinalido()
