@@ -231,7 +231,10 @@ def AplicarAlgoritmoSJF():
 
 def imprimirTabladeProcesos (nombreDeLista, listaDeProcesos): #imprime una tabla con los procesos
     print("-------------------------------")
-    print("-------",nombreDeLista,"------")
+    if nombreDeLista=="terminados" or nombreDeLista=="TERMINADOS":
+        print("-----------TERMINADOS----------")
+    else:
+        print("------------",nombreDeLista,"-----------")
     print("-------------------------------")
     print("| ID  |  tamaño  |  TA  |  TI |")
     print("-------------------------------")
@@ -272,6 +275,19 @@ def ponerEnTxt ():
         print("PROCESO:", a)
     return 0
 
+def MostrarProcesoEnEjecucion():
+    global memoria
+    for part in memoria:
+        if part["idMemo"]!=1:
+            if part["ejecutando"]:
+                    print("---------------------------------------------------------------------------------")
+                    print("|||||||||||||||||||||||| PROCESOS EN EJECUCION ||||||||||||||||||||||||||||||||||")
+                    print("---------------------------------------------------------------------------------")
+                    print("|  NOMBRE PART    |ID PARTICION| ID PROCESO |  tamaño  |  TA  |  TI  |")
+                    print("|  ", part["nombre"],"  |",part["idMemo"],"       | ",part["Proceso"]["id"],"     | ",part["Proceso"]["tamaño"], "           | ",part["Proceso"]["ta"], "|", part["Proceso"]["ti"]," |")
+                    print("---------------------------------------------------------------------------------")
+
+    return 0
 
 
 
@@ -304,19 +320,15 @@ memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True
 #LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
 listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
-suspendidos=list()      #lista de los procesos que estan en espera de libear espacio en memoria
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
 nuevos=listaDeProcesosNuevosPorDefault()
 
-tabla("nuevos",nuevos)
-tabla("momoria",memoria)
-
+imprimirTabladeProcesos("NUEVOS",nuevos)
 imprimirTabladeMemoria(memoria)
 
 #CODIGO MADRE
 while True:
-    break
     print(">------------------------------tiempo= ",T,"-- multiProg=",Multiprogramacion,"------------------------------<")
     #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listos y salgan de la lista de nuevos
     
@@ -345,10 +357,12 @@ while True:
     if cambios:
         cambios=False
         input("mostramos cambios...(precione cualquier tecla)")
-        tabla("memoria",memoria)
-        tabla("nuevos",nuevos)
-        tabla("listos",listos)
-        tabla("terminados",terminados)
+        imprimirTabladeMemoria(memoria)
+        imprimirTabladeProcesos("NUEVOS",nuevos)
+        imprimirTabladeProcesos("LISTOS",listos)
+        imprimirTabladeProcesos("TERMINADOS",terminados)
+        MostrarProcesoEnEjecucion()
+
         input("presione cualquier tecla para continuar")
     
     T+=1
