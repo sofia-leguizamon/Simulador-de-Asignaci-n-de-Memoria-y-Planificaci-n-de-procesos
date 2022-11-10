@@ -1,16 +1,11 @@
-'''#prueba para habrir un archivo existente ingresando el nombre por cmd
-a=input("ingrese el nombre del archivo que quiere abrir: ")
-a.rstrip("\n")      #esto es para eliminar el salto de linea del ingreso del texto
-arch1=open(a,"r")   #abro el archivo con nombre "a" como read
-
-for linea in arch1:
-    print(linea)
-
-'''
 
 #cracion de un proceso base y vacio, como si fuera una clase
 #por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
 # tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+from ast import Return
+from xml.dom.minidom import parseString
+
+
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
@@ -27,13 +22,15 @@ def listaDeProcesosNuevosPorDefault():
     idAutoIncr+=1
     ln.append(crearProceso(idAutoIncr,140,0,4))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,20,2,3))
+    ln.append(crearProceso(idAutoIncr,20,0,3))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,93,2,7))
+    ln.append(crearProceso(idAutoIncr,93,0,7))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,77,2,3))
+    ln.append(crearProceso(idAutoIncr,77,0,3))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,20,2,3))
+    ln.append(crearProceso(idAutoIncr,20,0,3))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,30,2,3))
     idAutoIncr+=1
     return ln
 
@@ -125,7 +122,7 @@ def sacarProcesoDeMemoria(partic):
     partic["enUso"]= False
     partic["fragI"]= 0
     terminados.append(partic["Proceso"])
-    Multiprogramacion-=1
+    Multiprogramacion+=1        #aca sumo uno a la multi porque termino un proces
     partic["Proceso"]= None
     partic["ejecutando"]=False
     return 0
@@ -140,11 +137,6 @@ def algoritmoWorstFit(proceso):
             return True
     return False
 
-#basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
-def AplicarAlgoritmoSJF():
-    global nuevos
-    nuevos=sorted(nuevos, key=lambda particion : particion['tamaño'],reverse=True)
-    return 0
 
 #esto es solo para mi para verificar las tablas- borar al final
 def tabla(name,table):
@@ -161,21 +153,22 @@ def terminoTodo():
 
 #pasa los proces de la cola de listos a la cola de nuevos si se cumple su tiempo de arribo
 def deNuevosAListos():
-    global nuevos,listos,T,cambios
+    global nuevos,listos,T,cambios,Multiprogramacion
     con=0
     for i in range(len(nuevos)):
-        if T>=nuevos[i-con]["ta"]:
+        if T>=nuevos[i-con]["ta"] and Multiprogramacion>0: #verifico aca tambien lo de la multi programacion
             listos.append(nuevos[i-con])
             nuevos.remove(nuevos[i-con])
             con+=1
             cambios=True
+            Multiprogramacion-=1    #aca resto 1 porque pasa un proceso de la cola de nuevos a listos
 
 #esta funcion verifica si termino algun proceso en el tiempo T
 def verificarProcesoFinalido():
     global memoria,T,Tp,cambios
     for part in memoria:
         if (part["Proceso"]!=None) and (part["ejecutando"]):
-            if part["Proceso"]["ti"]+Tp-1==T:
+            if part["Proceso"]["ti"]+Tp==T:
                 print("termino el proceso : ",part["Proceso"])
                 sacarProcesoDeMemoria(part)
                 cambios=True
@@ -210,9 +203,50 @@ def CorrerProcesoDeM():
     cambios=True
     return 0
 
+#basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
+def AplicarAlgoritmoSJF():
+    global listos,nuevos,memoria
+    #0_ ordenar la cola de listos de menor a mayor segun el ti
+    listos=sorted(listos, key=lambda particion : particion['ti'])
 
+    for part in memoria:
+        if (not part["ejecutando"]):
+            if part["Proceso"]==None:
+                    return 0
+    print("paso prueba 1")
 
+    #1_verificar que el los proceso que esta afuera tenga un ti menor que cualquier procesos cargado en memoria
+    if listos!=[]:
+        i=0; ban=True
+        for part in memoria:
+            if (not part["ejecutando"]):
+                print(part["Proceso"]["ti"],"---",listos[0]["ti"])
+                if part["Proceso"]["ti"] <= listos[0]["ti"]:
+                    print("finalizo")
+                    return 0
+                #2_ seleccionar la la particion donde entre en tamaño
+                if ban and listos[0]["tamaño"]<= part["tamaño"]:
+                    particionARemplazar=i
+                    ban=False
+            i+=1
+        
+        print("part elegida",particionARemplazar)
+                    
+    print("continua")
+    return 0
+    #2_seleccionar la particion en la que entre, (siempre que no se este ejecutando)
+	    
+    #
 
+    '''    mi=-1;idMem=None
+    for part in memoria:
+        if (not part["ejecutando"]):
+            if part["Proceso"]==None:
+                return 0
+            if part["Proceso"]["ti"]<mi:
+                mi=part["Proceso"]["ti"]'''
+                
+    return 0
 
 
 '''----------------------------------------------------------------------------------------------------------'''
@@ -249,48 +283,18 @@ terminados=list()       #procesos que ya han terminado, que ya se corrieron
 
 nuevos=listaDeProcesosNuevosPorDefault()
 
-tabla("nuevos",nuevos)
-tabla("momoria",memoria)
-
-
-'''ponerProcesoEnMemoria(memoria[1],crearProceso(idAutoIncr,100,1,2))
-ponerProcesoEnMemoria(memoria[3],crearProceso(idAutoIncr,40,3,4))
-tabla("memoria",memoria)'''
-
-#CODIGO MADRE
-while True:
-    print(">------------------------------tiempo= ",T,"------------------------------<")
-    #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listos y salgan de la lista de nuevos
-    deNuevosAListos()
-    #2. por cada unidad de tiempo verifica que no se puedan colocar procesos de la lista de listos en la memoria
-    listaMomentania=[]
-    for p in listos:
-        if algoritmoWorstFit(p):
-            print("proceso  ",p," --> colocado")
-            listaMomentania.append(p)
-            cambios=True
-        else:
-            print("proceso  ",p," --> NO PUDO SER COLOCADO")
-    #los porcesos colocados se borran de la cola de listos y quedan en la memoria
-    for r in listaMomentania:
-        listos.remove(r)
-    #3. por cada unidad de tiempo veridica si se puede correr un proceso o si un proceso finalizo
-    CorrerProcesoDeM()
-    verificarProcesoFinalido()
-
-    #imprime por pantalla cosas si hubo algun cambio
-    if cambios:
-        cambios=False
-        input("mostramos cambios...(precione cualquier tecla)")
-        tabla("memoria",memoria)
-        tabla("nuevos",nuevos)
-        tabla("listos",listos)
-        tabla("terminados",terminados)
-        input("presione cualquier tecla para continuar")
-    T+=1
-    if T==18:
-        break
-    #esto va a terminar cuando todos  los procesos esten terminados, osea que las otras listas esten vacias
+ponerProcesoEnMemoria(memoria[0],nuevos[0])
+ponerProcesoEnMemoria(memoria[1],nuevos[1])
+ponerProcesoEnMemoria(memoria[3],nuevos[3])
 
 tabla("memoria",memoria)
-tabla("terminados",terminados)
+print("\n",listos)
+listos.append(crearProceso(idAutoIncr+1,40,0,2))
+memoria[0]["ejecutando"]=True
+
+tabla("listos",listos)
+
+AplicarAlgoritmoSJF()
+'''AplicarAlgoritmoSJF()
+
+tabla("nuevos",nuevos)'''
