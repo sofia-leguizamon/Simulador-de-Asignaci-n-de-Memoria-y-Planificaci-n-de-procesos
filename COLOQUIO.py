@@ -197,6 +197,42 @@ def CorrerProcesoDeM():
     return 0
 
 
+def imprimirTabladeProcesos (diccionario): #imprime una tabla con los procesos
+    print("-------------------------------")
+    print("| ID  |  tamaño  |  TA  |  TI |")
+    print("-------------------------------")
+    for p in diccionario:
+        print("| ", p["id"] ,"  |  ", p["tamaño"],"  |  ",  p["ta"],"  |  ", p["ti"]," |"  )
+    print("-------------------------------")
+    return 0
+
+def imprimirTabladeMemoria (memoria): #imprime la memoria
+    print("-----------------------------------------------------------------------------------------")
+    print("--------------------------- T A B L A  D E  M E M O R I A -------------------------------")
+    print("-----------------------------------------------------------------------------------------")
+    print("| ID  |  Dir. de comienzo de partición  |  Tamaño  |  Proceso  |  Frgmentacion Interna  |")
+    print("-----------------------------------------------------------------------------------------")
+    for m in memoria:
+        print("| ", m["idMemo"] ," |  a solucionar                   |  ", m["tamaño"],"   |  ", m["Proceso"], "   |", m["fragI"],"                     |")
+    print("-----------------------------------------------------------------------------------------")
+    return 0   
+
+'''Toma un archivo previamente cargado y añade sus procesos, al diccionario de nuevos'''
+def ponerEnTxt (): 
+    global idAutoIncr, nuevos
+    archivoEntrada=open("pruebaDeArchivo.txt","r")
+    archivoEntrada.readline()      #salto la primera linea del txt, ya que explica las columnas nomas
+    for linea in archivoEntrada:
+         #se aplical la funcion split a una linea del txt, esta funcion corta los caracteres cuando encuentra
+         #espacios en blanco, cada elemento cortado lo coloco en una varible
+        m,n,o=linea.split()
+        a=crearProceso(idAutoIncr, int(m), int(n), int(o))
+        idAutoIncr+=1
+        nuevos.append(a)
+        print("PROCESO:", a)
+    return 0
+
+
 
 
 
@@ -260,7 +296,7 @@ while True:
     listaMomentania=[]
     for p in listos:
         if algoritmoWorstFit(p):
-            print("proceso  ",p," --> colocado")
+            print("proceso  ",p," --> colocado")  ###resolver
             listaMomentania.append(p)
             cambios=True
         else:
@@ -276,7 +312,7 @@ while True:
     if cambios:
         cambios=False
         input("mostramos cambios...(precione cualquier tecla)")
-        tabla("memoria",memoria)
+        imprimirTabladeMemoria(memoria)
         tabla("nuevos",nuevos)
         tabla("listos",listos)
         tabla("terminados",terminados)
