@@ -213,28 +213,29 @@ def AplicarAlgoritmoSJF():
         if (not part["ejecutando"]):
             if part["Proceso"]==None:
                     return 0
-    print("paso prueba 1")
 
     #1_verificar que el los proceso que esta afuera tenga un ti menor que cualquier procesos cargado en memoria
     if listos!=[]:
-        i=0; ban=True
+        i=0; ban=True ;particionARemplazar=None
         for part in memoria:
             if (not part["ejecutando"]):
-                print(part["Proceso"]["ti"],"---",listos[0]["ti"])
                 if part["Proceso"]["ti"] <= listos[0]["ti"]:
-                    print("finalizo")
                     return 0
-                #2_ seleccionar la la particion donde entre en tamaño
+                #2_ seleccionar la la particion donde entre en tamaño, (siempre que no se este ejecutando)
+                print("---")
                 if ban and listos[0]["tamaño"]<= part["tamaño"]:
                     particionARemplazar=i
                     ban=False
             i+=1
-        
-        print("part elegida",particionARemplazar)
-                    
-    print("continua")
+        if particionARemplazar==None: #si no  entra en en ninguna particion, debera salir de la funcions
+            return 0
+        #3_hacer el intercanvio del proceso que esta afuera con el que esta adentro
+        x=memoria[particionARemplazar]["Proceso"]
+        memoria[particionARemplazar]["Proceso"]=listos[0]
+        listos.remove(listos[0])
+        listos.append(x)          
     return 0
-    #2_seleccionar la particion en la que entre, (siempre que no se este ejecutando)
+
 	    
     #
 
@@ -283,18 +284,22 @@ terminados=list()       #procesos que ya han terminado, que ya se corrieron
 
 nuevos=listaDeProcesosNuevosPorDefault()
 
-ponerProcesoEnMemoria(memoria[0],nuevos[0])
+'''ponerProcesoEnMemoria(memoria[0],nuevos[0])
 ponerProcesoEnMemoria(memoria[1],nuevos[1])
 ponerProcesoEnMemoria(memoria[3],nuevos[3])
 
-tabla("memoria",memoria)
-print("\n",listos)
-listos.append(crearProceso(idAutoIncr+1,40,0,2))
+listos.append(crearProceso(idAutoIncr+1,130,0,2))
 memoria[0]["ejecutando"]=True
 
+tabla("memoria",memoria)
 tabla("listos",listos)
 
 AplicarAlgoritmoSJF()
-'''AplicarAlgoritmoSJF()
 
-tabla("nuevos",nuevos)'''
+tabla("memoria",memoria)
+tabla("listos",listos)'''
+
+print("cant nuevos ",len(nuevos))
+print("cant idAutoIncr", idAutoIncr)
+print("cant terminados", len(terminados))
+
