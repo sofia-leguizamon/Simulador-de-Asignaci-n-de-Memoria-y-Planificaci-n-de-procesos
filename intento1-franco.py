@@ -107,7 +107,7 @@ def crearMemoria():
 #carga en la particion, el proceso seleccionado ()
 def ponerProcesoEnMemoria(partic,proce): 
     #'partic' sera una particion de la memoria
-    #'proce' un proceso de la cola de listos
+    #'proce' un proceso de la cola de listosYsuspend
     partic["enUso"]= True
     partic["fragI"]= partic["tamaño"]-proce["tamaño"]
     partic["Proceso"]= proce
@@ -141,17 +141,17 @@ def tabla(name,table):
     print()
     return 0 
 
-#pasa los proces de la cola de listos a la cola de nuevos si se cumple su tiempo de arribo
-def deNuevosAListos():
-    global nuevos,listos,T,cambios,Multiprogramacion
+#pasa los proces de la cola de listosYsuspend a la cola de nuevos si se cumple su tiempo de arribo
+def deNuevosAlistosYsuspend():
+    global nuevos,listosYsuspend,T,cambios,Multiprogramacion
     con=0
     for i in range(len(nuevos)):
         if T>=nuevos[i-con]["ta"] and Multiprogramacion>0: #verifico aca tambien lo de la multi programacion
-            listos.append(nuevos[i-con])
+            listosYsuspend.append(nuevos[i-con])
             nuevos.remove(nuevos[i-con])
             con+=1
             cambios=True
-            Multiprogramacion-=1    #aca resto 1 porque pasa un proceso de la cola de nuevos a listos
+            Multiprogramacion-=1    #aca resto 1 porque pasa un proceso de la cola de nuevos a listosYsuspend
 
 #esta funcion verifica si termino algun proceso en el tiempo T
 def verificarProcesoFinalido():
@@ -195,9 +195,9 @@ def CorrerProcesoDeM():
 
 #basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
 def AplicarAlgoritmoSJF():
-    global listos,nuevos,memoria,cambios
-    #0_ ordenar la cola de listos de menor a mayor segun el ti
-    listos=sorted(listos, key=lambda particion : particion['ti'])
+    global listosYsuspend,nuevos,memoria,cambios
+    #0_ ordenar la cola de listosYsuspend de menor a mayor segun el ti
+    listosYsuspend=sorted(listosYsuspend, key=lambda particion : particion['ti'])
 
     for part in memoria:
         if (not part["ejecutando"]):
@@ -205,15 +205,14 @@ def AplicarAlgoritmoSJF():
                     return 0
 
     #1_verificar que el los proceso que esta afuera tenga un ti menor que cualquier procesos cargado en memoria
-    if listos!=[]:
+    if listosYsuspend!=[]:
         i=0; ban=True ;particionARemplazar=None
         for part in memoria:
             if (not part["ejecutando"]):
-                if part["Proceso"]["ti"] <= listos[0]["ti"]:
+                if part["Proceso"]["ti"] <= listosYsuspend[0]["ti"]:
                     return 0
                 #2_ seleccionar la la particion donde entre en tamaño, (siempre que no se este ejecutando)
-                print("---")
-                if ban and listos[0]["tamaño"]<= part["tamaño"]:
+                if ban and listosYsuspend[0]["tamaño"]<= part["tamaño"]:
                     particionARemplazar=i
                     ban=False
             i+=1
@@ -221,32 +220,28 @@ def AplicarAlgoritmoSJF():
             return 0
         #3_hacer el intercanvio del proceso que esta afuera con el que esta adentro
         x=memoria[particionARemplazar]["Proceso"]
-        memoria[particionARemplazar]["Proceso"]=listos[0]
-        listos.remove(listos[0])
-        listos.append(x)
+        memoria[particionARemplazar]["Proceso"]=listosYsuspend[0]
+        listosYsuspend.remove(listosYsuspend[0])
+        listosYsuspend.append(x)
         cambios=True
-        print("---> por SJF se cambio el proceso ",x," de la ",memoria[particionARemplazar]["nombre"]," por ",memoria[particionARemplazar]["Proceso"])    
+        print(">--- aplicando SJF se cambio el proceso con ID:",x["id"],"y TI:",x["ti"]," de la ",memoria[particionARemplazar]["nombre"]," por el proceso con ID: ",memoria[particionARemplazar]["Proceso"]["id"],"y TI: ",memoria[particionARemplazar]["Proceso"]["ti"])    
     return 0
 
 
 def imprimirTabladeProcesos (nombreDeLista, listaDeProcesos): #imprime una tabla con los procesos
-    print("-------------------------------")
     if nombreDeLista=="terminados" or nombreDeLista=="TERMINADOS":
         print("-----------TERMINADOS----------")
     else:
         print("------------",nombreDeLista,"-----------")
-    print("-------------------------------")
     print("| ID  |  tamaño  |  TA  |  TI |")
     print("-------------------------------")
     for p in listaDeProcesos:
         print("| ", p["id"] ,"  |  ", p["tamaño"],"  |  ",  p["ta"],"  |  ", p["ti"]," |"  )
-    print("-------------------------------")
+    print("-------------------------------\n")
     return 0
 
 def imprimirTabladeMemoria (memoria): #imprime la memoria
-    print("-----------------------------------------------------------------------------------------")
     print("--------------------------- T A B L A  D E  M E M O R I A -------------------------------")
-    print("-----------------------------------------------------------------------------------------")
     print("| ID  |  Dir. de comienzo de partición  |  Tamaño  | Id Proceso  |  Frgmentacion Interna  |")
     print("-----------------------------------------------------------------------------------------")
     memoria=sorted(memoria, key=lambda particion : particion["idMemo"],reverse=True)
@@ -256,14 +251,14 @@ def imprimirTabladeMemoria (memoria): #imprime la memoria
             print("| ", memoria[i]["idMemo"] ," |               ", dirCdePar[i] ,"             | ", memoria[i]["tamaño"],"   |  ", memoria[i]["Proceso"]["id"], "   |", memoria[i]["fragI"],"                     |")
         else:
             print("| ", memoria[i]["idMemo"] ," |               ", dirCdePar[i] ,"             | ", memoria[i]["tamaño"],"   |  no tiene   |", memoria[i]["fragI"],"                     |")    
-    print("-----------------------------------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------\n")
     return 0   
 
 
 '''Toma un archivo previamente cargado y añade sus procesos, al diccionario de nuevos'''
-def ponerEnTxt (): 
+def procesosDeUnArchivoExterno(): 
     global idAutoIncr, nuevos
-    archivoEntrada=open("pruebaDeArchivo.txt","r")
+    archivoEntrada=open("ArchivoDeProcesos.txt","r")
     archivoEntrada.readline()      #salto la primera linea del txt, ya que explica las columnas nomas
     for linea in archivoEntrada:
          #se aplical la funcion split a una linea del txt, esta funcion corta los caracteres cuando encuentra
@@ -272,7 +267,6 @@ def ponerEnTxt ():
         a=crearProceso(idAutoIncr, int(m), int(n), int(o))
         idAutoIncr+=1
         nuevos.append(a)
-        print("PROCESO:", a)
     return 0
 
 def MostrarProcesoEnEjecucion():
@@ -280,14 +274,23 @@ def MostrarProcesoEnEjecucion():
     for part in memoria:
         if part["idMemo"]!=1:
             if part["ejecutando"]:
-                    print("---------------------------------------------------------------------------------")
                     print("|||||||||||||||||||||||| PROCESOS EN EJECUCION ||||||||||||||||||||||||||||||||||")
-                    print("---------------------------------------------------------------------------------")
-                    print("|  NOMBRE PART    |ID PARTICION| ID PROCESO |  tamaño  |  TA  |  TI  |")
-                    print("|  ", part["nombre"],"  |",part["idMemo"],"       | ",part["Proceso"]["id"],"     | ",part["Proceso"]["tamaño"], "           | ",part["Proceso"]["ta"], "|", part["Proceso"]["ti"]," |")
-                    print("---------------------------------------------------------------------------------")
-
+                    print("| ID PROCESO |  tamaño  |  TA  |  TI  |  NOMBRE PART    |ID PARTICION|")
+                    print("|  ",part["Proceso"]["id"],"       | ",part["Proceso"]["tamaño"], "     | ",part["Proceso"]["ta"], "  |", part["Proceso"]["ti"],"   |  ", part["nombre"],"  | ",part["idMemo"],"       | ")
+                    print("---------------------------------------------------------------------------------\n")
     return 0
+
+def MostrarProcesosEnListos():
+    global memoria
+    print("-------------LISTOS------------")
+    print("| ID  |  tamaño  |  TA  |  TI |")
+    print("-------------------------------")
+    for part in memoria:
+        if (not part["ejecutando"]) and part["Proceso"]!=None:
+            print("| ", part["Proceso"]["id"] ,"  |  ", part["Proceso"]["tamaño"],"  |  ",  part["Proceso"]["ta"],"  |  ", part["Proceso"]["ti"]," |"  )
+    print("-------------------------------\n")
+    return 0
+
 
 
 
@@ -319,35 +322,53 @@ memoria=sorted(memoria, key=lambda particion : particion['tamaño'],reverse=True
 
 #LAS DISTINTAS COLAS DE PROCEOSOS
 nuevos=list()           #lista de los procesos que recien llegan , todabia no se cumple su TA
-listos=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
+listosYsuspend=list()           #lista de los procesos que ya podrian entrar en memoria, ya se cumplio su TA
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
-nuevos=listaDeProcesosNuevosPorDefault()
+#comienza el menu con las distintas opciones para el usuario
+print("mensaje de bienvenida")
+print("1 - correr simulacion con procesos por default ")
+print("2 - correr simulacion con procesos que esten cargados en un archivo externo: 'ArchivoDeProcesos.txt'. ")
+while True:
+    try:
+        ax=int(input("ingrese una de las opciones: "))
+        if ax==1:
+            nuevos=listaDeProcesosNuevosPorDefault()
+            break
+        elif ax==2:
+            procesosDeUnArchivoExterno()
+            break
+        else:
+            print("opcion invalida, pruebe de nuevo...")
+    except:
+        print("error:solo numeros por favor")
+
 
 imprimirTabladeProcesos("NUEVOS",nuevos)
 imprimirTabladeMemoria(memoria)
+MostrarProcesosEnListos()
 
 #CODIGO MADRE
 while True:
-    print(">------------------------------tiempo= ",T,"-- multiProg=",Multiprogramacion,"------------------------------<")
-    #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listos y salgan de la lista de nuevos
+    print(">------------------------------tiempo= ",T,"-- multiProg=",Multiprogramacion,"------------------------------<\n")
+    #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listosYsuspend y salgan de la lista de nuevos
     
     verificarProcesoFinalido()  #se hace esta verificacion porque cuando un proceso termina ya tiene que ingresar otro
-    deNuevosAListos()
+    deNuevosAlistosYsuspend()
     AplicarAlgoritmoSJF()
     
-    #2. por cada unidad de tiempo verifica que no se puedan colocar procesos de la lista de listos en la memoria
+    #2. por cada unidad de tiempo verifica que no se puedan colocar procesos de la lista de listosYsuspend en la memoria
     listaMomentania=[]
-    for p in listos:
+    for p in listosYsuspend:
         if algoritmoWorstFit(p):
-            print("proceso  ",p," --> colocado")
+            print(">--------------------EL PROCESO CON ID: ",p["id"]," FUE COLOCADO EN MEMORIA--------------------<")
             listaMomentania.append(p)
             cambios=True
-        else:
-            print("proceso  ",p," --> NO PUDO SER COLOCADO")
-    #los porcesos colocados se borran de la cola de listos y quedan en la memoria
+        '''else:
+            print("proceso  ",p," --> NO PUDO SER COLOCADO")'''
+    #los porcesos colocados se borran de la cola de listosYsuspend y quedan en la memoria
     for r in listaMomentania:
-        listos.remove(r)
+        listosYsuspend.remove(r)
     
     #3. por cada unidad de tiempo veridica si se puede correr un proceso o si un proceso finalizo
     CorrerProcesoDeM()
@@ -359,7 +380,8 @@ while True:
         input("mostramos cambios...(precione cualquier tecla)")
         imprimirTabladeMemoria(memoria)
         imprimirTabladeProcesos("NUEVOS",nuevos)
-        imprimirTabladeProcesos("LISTOS",listos)
+        MostrarProcesosEnListos()
+        imprimirTabladeProcesos("LIS/SUS",listosYsuspend)
         imprimirTabladeProcesos("TERMINADOS",terminados)
         MostrarProcesoEnEjecucion()
 
@@ -372,4 +394,4 @@ while True:
     #esto va a terminar cuando todos  los procesos esten terminados, osea que las otras listas esten vacias
 
 print("gracias por vernos hasta el final")
-print("esto fue el grupo 2... creo")
+print("esto fue el grupo 2... ")
