@@ -2,6 +2,9 @@
 #cracion de un proceso base y vacio, como si fuera una clase
 #por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
 # tamaño del proceso, tiempo de arribo y tiempo de irrupción.
+import re
+
+
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
@@ -14,20 +17,24 @@ def crearProceso(id,tamaño,ta=0,ti=0):
 def listaDeProcesosNuevosPorDefault():
     global idAutoIncr
     ln=list()
-    ln.append(crearProceso(idAutoIncr,40,0,3))
+    ln.append(crearProceso(idAutoIncr,170,0,2))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,50,0,4))
+    ln.append(crearProceso(idAutoIncr,220,0,2))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,20,0,3))
+    ln.append(crearProceso(idAutoIncr,140,1,3))
     idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,93,1,2))
+    ln.append(crearProceso(idAutoIncr,70,1,2))
     idAutoIncr+=1
-    '''ln.append(crearProceso(idAutoIncr,77,0,3))
-    idAutoIncr+=1
-    ln.append(crearProceso(idAutoIncr,20,0,3))
+    ln.append(crearProceso(idAutoIncr,100,1,4))
     idAutoIncr+=1
     ln.append(crearProceso(idAutoIncr,30,2,3))
-    idAutoIncr+=1'''
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,30,2,5))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,120,3,4))
+    idAutoIncr+=1
+    ln.append(crearProceso(idAutoIncr,60,4,5))
+    idAutoIncr+=1
     return ln
 
 #pide y verifica el ingreso de un proceso por pantalla, debolviendp dicho proceso como un diccionario ya definido
@@ -159,7 +166,7 @@ def verificarProcesoFinalido():
     for part in memoria:
         if (part["Proceso"]!=None) and (part["ejecutando"]):
             if part["Proceso"]["ti"]+Tp==T:
-                print("termino el proceso : ",part["Proceso"])
+                print("--------} EL PROCESO  ID:",part["Proceso"]["id"]," FINALIZO \n")
                 sacarProcesoDeMemoria(part)
                 cambios=True
     return 0
@@ -178,7 +185,8 @@ def CorrerProcesoDeM():
             cont+=1
         if cont==4:
             return 0
-
+    
+    #busco la part con ti mas chica
     x=10000
     s=0
     cont=0
@@ -188,6 +196,83 @@ def CorrerProcesoDeM():
                 x=part["Proceso"]["ti"]
                 s=cont
         cont+=1
+    # en x queda el valor mas pequeño de ti en memoria
+    
+    #verifico si hay mas de 1(un) proceso cargado en memoria que tenga el menor ti
+    contadorDeProcesosConMismoTI=0
+    for part in memoria:
+        if (part["idMemo"]!=1)and(part["Proceso"]!=None) and x==part["Proceso"]["ti"]:
+            contadorDeProcesosConMismoTI+=1
+    
+    #si no hay mas de 1, pongo en ejecucion el unico que esta
+    if contadorDeProcesosConMismoTI<2:
+        memoria[s]["ejecutando"]=True
+        Tp=T
+        cambios=True
+        return 0
+    else:#si hay mas de 1 tengo que buscar el que tenga menor ta
+        #busco entre los procesos cargados el que tenga menor ta y mismo ti que x
+        x2=10000
+        cont=0
+        for part in memoria:
+            if (part["idMemo"]!=1)and(part["Proceso"]!=None) and part["Proceso"]["ti"]==x:
+                if part["Proceso"]["ta"] < x2:
+                    x2=part["Proceso"]["ta"]
+                    s=cont
+            cont+=1
+        #en x2 nos queda el menor ta de los procesos con ti=x
+            
+        #verifico que no haya 2 procesos con mismo ti y ta
+        contadorDeProcesosConMismoTIyTA=0
+        for part in memoria:
+            if (part["idMemo"]!=1)and(part["Proceso"]!=None) and x==part["Proceso"]["ti"] and x2==part["Proceso"]["ta"]:
+                contadorDeProcesosConMismoTIyTA+=1
+
+        #si no hay dos procesos con el mismo ti y ta
+        if contadorDeProcesosConMismoTIyTA<2:
+            memoria[s]["ejecutando"]=True
+            Tp=T
+            cambios=True
+            return 0
+        else:# si hay dos procesos con el mismo ti y ta se debe priorizar el de menor id
+            #busco en los proceos cargados en memoria el de menor id e igual ti y ta
+            x3=10000
+            cont=0
+            for part in memoria:
+                if (part["idMemo"]!=1)and(part["Proceso"]!=None) and part["Proceso"]["ti"]==x and x2==part["Proceso"]["ta"]:
+                    if part["Proceso"]["id"] < x3:
+                        x2=part["Proceso"]["id"]
+                        s=cont
+                cont+=1
+            #y lo ejecuto ya que nunca va a existir dos procesos con mmismo id
+            memoria[s]["ejecutando"]=True
+            Tp=T
+            cambios=True
+            return 0
+
+
+    
+    '''
+    #caso especial en el que haya dos procesos con los mismos ti y ta que hayan llegado en tiempos diferentes
+    for part in memoria:
+        for part2 in memoria:
+            if part["idMemo"]!=1 and part2["idMemo"]!=1 and part["idMemo"]!=part2["idMemo"]:
+                if part["Proceso"]!=None and part2["Proceso"]!=None and part["Proceso"]["ti"]==x and part2["Proceso"]["ti"]==x:
+                    if part["Proceso"]["ta"]==part2["Proceso"]["ta"]:
+                        print("LLEEEEEEEEEEEEEEEEEGOOOOOOOOOOOOOOOOOOOOOOO")
+                        if part["Proceso"]["id"]<part2["Proceso"]["id"]:
+                            part["ejecutando"]=True
+                            Tp=T
+                            cambios=True
+                            return 0
+                        else:
+                            part2["ejecutando"]=True
+                            Tp=T
+                            cambios=True
+                            return 0
+    '''
+
+
     memoria[s]["ejecutando"]=True
     Tp=T
     cambios=True
@@ -224,7 +309,7 @@ def AplicarAlgoritmoSJF():
         listosYsuspend.remove(listosYsuspend[0])
         listosYsuspend.append(x)
         cambios=True
-        print(">--- aplicando SJF se cambio el proceso con ID:",x["id"],"y TI:",x["ti"]," de la ",memoria[particionARemplazar]["nombre"]," por el proceso con ID: ",memoria[particionARemplazar]["Proceso"]["id"],"y TI: ",memoria[particionARemplazar]["Proceso"]["ti"])    
+        print("-----} aplicando SJF se cambio el proceso con ID:",x["id"],"y TI:",x["ti"]," de la ",memoria[particionARemplazar]["nombre"]," por el proceso con ID: ",memoria[particionARemplazar]["Proceso"]["id"],"y TI: ",memoria[particionARemplazar]["Proceso"]["ti"],"\n")    
     return 0
 
 
@@ -274,7 +359,7 @@ def MostrarProcesoEnEjecucion():
     for part in memoria:
         if part["idMemo"]!=1:
             if part["ejecutando"]:
-                    print("|||||||||||||||||||||||| PROCESOS EN EJECUCION ||||||||||||||||||||||||||||||||||")
+                    print("|||||||||||||||||||||||| PROCESO EN EJECUCION ||||||||||||||||||||||||||||||")
                     print("| ID PROCESO |  tamaño  |  TA  |  TI  |  NOMBRE PART    |ID PARTICION|")
                     print("|  ",part["Proceso"]["id"],"       | ",part["Proceso"]["tamaño"], "     | ",part["Proceso"]["ta"], "  |", part["Proceso"]["ti"],"   |  ", part["nombre"],"  | ",part["idMemo"],"       | ")
                     print("---------------------------------------------------------------------------------\n")
@@ -286,7 +371,8 @@ def MostrarProcesosEnListos():
     print("| ID  |  tamaño  |  TA  |  TI |")
     print("-------------------------------")
     for part in memoria:
-        if (not part["ejecutando"]) and part["Proceso"]!=None:
+        #(not part["ejecutando"]) and
+        if part["Proceso"]!=None:
             print("| ", part["Proceso"]["id"] ,"  |  ", part["Proceso"]["tamaño"],"  |  ",  part["Proceso"]["ta"],"  |  ", part["Proceso"]["ti"]," |"  )
     print("-------------------------------\n")
     return 0
@@ -326,7 +412,8 @@ listosYsuspend=list()           #lista de los procesos que ya podrian entrar en 
 terminados=list()       #procesos que ya han terminado, que ya se corrieron 
 
 #comienza el menu con las distintas opciones para el usuario
-print("mensaje de bienvenida")
+print("Hola bienvenidos a este simulador de memoria del grupo 2:")
+print("Para comenzar necesitamo cargar algunos procesos, podemos :")
 print("1 - correr simulacion con procesos por default ")
 print("2 - correr simulacion con procesos que esten cargados en un archivo externo: 'ArchivoDeProcesos.txt'. ")
 while True:
@@ -346,11 +433,11 @@ while True:
 
 imprimirTabladeProcesos("NUEVOS",nuevos)
 imprimirTabladeMemoria(memoria)
-MostrarProcesosEnListos()
+
 
 #CODIGO MADRE
 while True:
-    print(">------------------------------tiempo= ",T,"-- multiProg=",Multiprogramacion,"------------------------------<\n")
+    print(">------------------------------tiempo= ",T,"-- multiProg=",5-Multiprogramacion,"------------------------------<\n")
     #1. por cada unidad de tiempo que pase verifica que haya procesos que se puedan agregar a la lista de listosYsuspend y salgan de la lista de nuevos
     
     verificarProcesoFinalido()  #se hace esta verificacion porque cuando un proceso termina ya tiene que ingresar otro
@@ -361,7 +448,7 @@ while True:
     listaMomentania=[]
     for p in listosYsuspend:
         if algoritmoWorstFit(p):
-            print(">--------------------EL PROCESO CON ID: ",p["id"]," FUE COLOCADO EN MEMORIA--------------------<")
+            print("--------} EL PROCESO CON ID: ",p["id"]," FUE COLOCADO EN MEMORIA")
             listaMomentania.append(p)
             cambios=True
         '''else:
@@ -379,14 +466,25 @@ while True:
         cambios=False
         input("mostramos cambios...(precione cualquier tecla)")
         imprimirTabladeMemoria(memoria)
-        imprimirTabladeProcesos("NUEVOS",nuevos)
         MostrarProcesosEnListos()
-        imprimirTabladeProcesos("LIS/SUS",listosYsuspend)
-        imprimirTabladeProcesos("TERMINADOS",terminados)
         MostrarProcesoEnEjecucion()
 
+        if nuevos==[]:
+            print("------COLA DE LISTOS VACIA-----\n")
+        else:
+            imprimirTabladeProcesos("NUEVOS",nuevos)
+        if listosYsuspend==[]:
+            print("------COLA DE LIS/SUS VACIA-----\n")
+        else:
+            imprimirTabladeProcesos("LIS/SUS",listosYsuspend)
+        if terminados==[]:
+            print("----COLA DE TERMINADOS VACIA----\n")
+        else:
+            imprimirTabladeProcesos("TERMINADOS",terminados)
+            
         input("presione cualquier tecla para continuar")
-    
+
+
     T+=1
     #esta es la verificacion de fin del algoritmo(codigo madre)
     if len(terminados)==idAutoIncr:
@@ -395,3 +493,4 @@ while True:
 
 print("gracias por vernos hasta el final")
 print("esto fue el grupo 2... ")
+input("precione enter para finalizar")
