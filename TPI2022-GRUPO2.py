@@ -1,19 +1,16 @@
 
-#cracion de un proceso base y vacio, como si fuera una clase
-#por cada proceso se debe ingresaro leer desde un archivo el Id de proceso, 
-# tamaño del proceso, tiempo de arribo y tiempo de irrupción.
-import re
-
-
+#Creación de un proceso base y vacio, como si fuera una clase
+#Por cada proceso se debe ingresar leer desde un archivo el Id de proceso, 
+#Tamaño del proceso, tiempo de arribo y tiempo de irrupción.
 def crearProceso(id,tamaño,ta=0,ti=0):
     a=dict()
     a["id"] = id            #el numero de proceso
-    a["tamaño"] = tamaño    #tamño de dicho proceso en kb
+    a["tamaño"] = tamaño    #tamaño de dicho proceso en kb
     a["ta"] = ta            #tiempo de arribo
     a["ti"] = ti            #tiempo de irrupcion
     return a
 
-#Crea unos procesos de prueva y los pone en una lista
+#Crea unos procesos de prueba y los pone en una lista
 def listaDeProcesosNuevosPorDefault():
     global idAutoIncr
     ln=list()
@@ -250,32 +247,6 @@ def CorrerProcesoDeM():
             cambios=True
             return 0
 
-
-    
-    '''
-    #caso especial en el que haya dos procesos con los mismos ti y ta que hayan llegado en tiempos diferentes
-    for part in memoria:
-        for part2 in memoria:
-            if part["idMemo"]!=1 and part2["idMemo"]!=1 and part["idMemo"]!=part2["idMemo"]:
-                if part["Proceso"]!=None and part2["Proceso"]!=None and part["Proceso"]["ti"]==x and part2["Proceso"]["ti"]==x:
-                    if part["Proceso"]["ta"]==part2["Proceso"]["ta"]:
-                        print("LLEEEEEEEEEEEEEEEEEGOOOOOOOOOOOOOOOOOOOOOOO")
-                        if part["Proceso"]["id"]<part2["Proceso"]["id"]:
-                            part["ejecutando"]=True
-                            Tp=T
-                            cambios=True
-                            return 0
-                        else:
-                            part2["ejecutando"]=True
-                            Tp=T
-                            cambios=True
-                            return 0
-    '''
-
-
-    memoria[s]["ejecutando"]=True
-    Tp=T
-    cambios=True
     return 0
 
 #basicamente ordenamoms la lista de nuevos por el tiempo de irrupcion nomas
@@ -330,7 +301,7 @@ def imprimirTabladeMemoria (memoria): #imprime la memoria
     print("| ID  |  Dir. de comienzo de partición  |  Tamaño  | Id Proceso  |  Frgmentacion Interna  |")
     print("-----------------------------------------------------------------------------------------")
     memoria=sorted(memoria, key=lambda particion : particion["idMemo"],reverse=True)
-    dirCdePar=[0,100,160,280]
+    dirCdePar=[280,160,100,0]
     for i in range(4):
         if memoria[i]["Proceso"]!= None:
             print("| ", memoria[i]["idMemo"] ," |               ", dirCdePar[i] ,"             | ", memoria[i]["tamaño"],"   |  ", memoria[i]["Proceso"]["id"], "   |", memoria[i]["fragI"],"                     |")
@@ -348,10 +319,13 @@ def procesosDeUnArchivoExterno():
     for linea in archivoEntrada:
          #se aplical la funcion split a una linea del txt, esta funcion corta los caracteres cuando encuentra
          #espacios en blanco, cada elemento cortado lo coloco en una varible
-        m,n,o=linea.split()
-        a=crearProceso(idAutoIncr, int(m), int(n), int(o))
-        idAutoIncr+=1
-        nuevos.append(a)
+        try:
+            m,n,o=linea.split()
+            a=crearProceso(idAutoIncr, int(m), int(n), int(o))
+            idAutoIncr+=1
+            nuevos.append(a)
+        except:
+            print("---> En el proceso ",linea,"Tiene un valor invalido por lo que el proceso es desechado")
     return 0
 
 def MostrarProcesoEnEjecucion():
@@ -376,6 +350,11 @@ def MostrarProcesosEnListos():
             print("| ", part["Proceso"]["id"] ,"  |  ", part["Proceso"]["tamaño"],"  |  ",  part["Proceso"]["ta"],"  |  ", part["Proceso"]["ti"]," |"  )
     print("-------------------------------\n")
     return 0
+
+def verificarProcesosNuevos():
+    global nuevos
+    for pro in nuevos:
+        print()
 
 
 
