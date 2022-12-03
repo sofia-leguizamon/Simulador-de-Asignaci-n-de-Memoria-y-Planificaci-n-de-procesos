@@ -137,14 +137,6 @@ def algoritmoWorstFit(proceso):
             return True
     return False
 
-#esto es solo para mi para verificar las tablas- borar al final
-def tabla(name,table):
-    print("\n",name,"\n")
-    for i in table:
-        print(i)
-    print()
-    return 0 
-
 #pasa los proces de la cola de listosYsuspend a la cola de nuevos si se cumple su tiempo de arribo
 def deNuevosAlistosYsuspend():
     global nuevos,listosYsuspend,T,cambios,Multiprogramacion
@@ -352,11 +344,33 @@ def MostrarProcesosEnListos():
     return 0
 
 def verificarProcesosNuevos():
-    global nuevos
+    global nuevos,idAutoIncr
+    listAux=[]
     for pro in nuevos:
-        print()
-
-
+        #verificar que el tamaño del proceso no sea mayor a la de la particion maxima
+        if pro["tamaño"]>250:
+            listAux.append(pro)
+            print("Se removera de la lista de Nuevos el proceso con id=,",pro["id"], " porque el tamaño del mismo es mayor que el de la particion más grande(250kb)")
+        #verificar que no haya valores negativos
+        #verificar que el ti no sea 0
+        elif pro["tamaño"]==0:
+            listAux.append(pro)
+            print("Se removera de la lista de Nuevos el proceso con id=,",pro["id"], " porque el tamaño del mismo es 0 , es considerado un valor invalido")
+        elif pro["tamaño"]<0 or pro["ti"]<0 or pro["ta"]<0:
+            listAux.append(pro)
+            print("Se removera de la lista de Nuevos el proceso con id=,",pro["id"], " porque tiene valores negatios en alguno de sus campos")
+        elif pro["ti"]==0:
+            listAux.append(pro)
+            print("Se removera de la lista de Nuevos el proceso con id=,",pro["id"], " porque el ti es igual a 0 (cero)")
+    
+    if listAux==[]:
+        return False
+    else:
+        for r in listAux:
+            nuevos.remove(r)
+            idAutoIncr-=1  #esto se hace por la condicion de fin del algoritmo madre
+        return True
+        
 
 
 '''----------------------------------------------------------------------------------------------------------'''
@@ -411,8 +425,12 @@ while True:
 
 
 imprimirTabladeProcesos("NUEVOS",nuevos)
-imprimirTabladeMemoria(memoria)
+print()
+if verificarProcesosNuevos():
+    print()
+    imprimirTabladeProcesos("NUEVOS",nuevos)
 
+imprimirTabladeMemoria(memoria)
 
 #CODIGO MADRE
 while True:
@@ -443,7 +461,7 @@ while True:
     #imprime por pantalla cosas si hubo algun cambio
     if cambios:
         cambios=False
-        input("mostramos cambios...(precione cualquier tecla)")
+        input("Hubieon cambios en la memoria...(presione enter para continuar)")
         imprimirTabladeMemoria(memoria)
         MostrarProcesosEnListos()
         MostrarProcesoEnEjecucion()
@@ -461,7 +479,7 @@ while True:
         else:
             imprimirTabladeProcesos("TERMINADOS",terminados)
             
-        input("presione cualquier tecla para continuar")
+        input("presione enter para continuar")
 
 
     T+=1
@@ -472,4 +490,4 @@ while True:
 
 print("gracias por vernos hasta el final")
 print("esto fue el grupo 2... ")
-input("precione enter para finalizar")
+input("presione enter para finalizar")
